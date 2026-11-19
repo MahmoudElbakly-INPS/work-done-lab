@@ -101,7 +101,7 @@ footer{text-align:center;font-size:12px;color:var(--muted);padding:6px 0 18px}
       <div class="sub">Al Ittihad National Private School · Physics I (PHY311) · Grade 11</div>
       <h1>W12L03 · Work Done Virtual Lab</h1>
     </div>
-    <div class="tag">Unit 2 / Work &amp; Energy</div>
+    <div class="tag">Unit 3 / Work, Energy &amp; Power</div>
   </div>
 </header>
 <div class="idbar">
@@ -244,7 +244,8 @@ footer{text-align:center;font-size:12px;color:var(--muted);padding:6px 0 18px}
     <div class="q"><p>P1. On a frictionless surface, with F and d kept the same, which angle (0°, 45° or 90°) gives the most work? Sketch or describe the force components to justify your answer. <span class="lv">DOK 2</span></p><textarea></textarea></div>
 
     <h3>Explore A: Changing the angle</h3>
-    <div class="setup"><b>Set up:</b> Surface = Frictionless · m = 4.0 kg · F = 20 N · d = 5.0 m · v₀ = 0 m/s. Run each angle.</div>
+    <div class="setup"><b>Set up:</b> Surface = Frictionless · m = 4.0 kg · F = 20 N · d = 5.0 m · v₀ = 1.0 m/s. Run each angle.</div>
+    <p class="note">v₀ = 1.0 m/s makes sure the block slides the full 5.0 m at every angle, even at 90°, so any zero work comes from the angle and not from a lack of displacement.</p>
     <table id="silverA"><tr><th>θ (°)</th><th>cos θ</th><th>W_F from sim (J)</th><th>W = Fd cos θ (J)</th></tr>
       <tr><td>0</td><td><input></td><td><input></td><td><input></td></tr>
       <tr><td>15</td><td><input></td><td><input></td><td><input></td></tr>
@@ -427,7 +428,7 @@ function drawBlock(){
   // block
   const bx=X0+pos*PPM, by=GY-BH;
   ctx.fillStyle="#0b2a63";ctx.fillRect(bx-BW/2,by,BW,BH);ctx.fillStyle="#fff";ctx.font="bold 12px Segoe UI, Arial";ctx.fillText(S.m+" kg",bx-15,by+24);
-  ctx.fillStyle="#1b2333";ctx.font="12px Segoe UI, Arial";ctx.fillText("v = "+fmt(vel)+" m/s",bx-30,by-58<14?14:by-62);
+  ctx.fillStyle="#1b2333";ctx.font="bold 12px Segoe UI, Arial";ctx.fillText("x = "+fmt(pos)+" m    v = "+fmt(vel)+" m/s",10,18);
   if(sol.lifted){return;}
   const cx=bx, cy=by+BH/2, maxF=Math.max(S.F,S.m*g,1), sc=85/maxF;
   // forces
@@ -588,8 +589,11 @@ document.getElementById("copyBtn").onclick=async()=>{
     else{const t=el.querySelector("textarea");const q=el.querySelector("p")?el.querySelector("p").textContent.trim():"Discuss · Record · Share";lines.push(q,"→ "+(t&&t.value?t.value:"___"),"");}
   });
   const note=document.getElementById("footNote");
-  try{await navigator.clipboard.writeText(lines.join("\n"));note.textContent="Copied. Paste into your Schoology submission.";}
-  catch(e){note.textContent="Copy was blocked by the browser. Select your answers and copy them manually.";}
+  const txt=lines.join("\n");
+  const legacy=()=>{const ta=document.createElement("textarea");ta.value=txt;ta.setAttribute("readonly","");ta.style.cssText="position:fixed;left:-9999px;top:0";document.body.appendChild(ta);ta.select();let ok=false;try{ok=document.execCommand("copy");}catch(e){}document.body.removeChild(ta);return ok;};
+  let ok=false;
+  try{await navigator.clipboard.writeText(txt);ok=true;}catch(e){ok=legacy();}
+  note.textContent=ok?"Copied. Paste into your Schoology submission.":"Copy was blocked by the browser. Open the lab in a full window and try again.";
 };
 document.getElementById("printBtn").onclick=()=>{
   const note=document.getElementById("footNote");
