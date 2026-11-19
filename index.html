@@ -1,0 +1,604 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>W12L03 Work Done Virtual Lab</title>
+<style>
+:root{
+  --navy:#0b2a63; --navy2:#123a80; --red:#c8102e; --ink:#1b2333; --muted:#5b6578;
+  --line:#d8dde8; --bg:#f4f6fb; --card:#ffffff;
+  --bronze:#a0622d; --silver:#6f7c8c; --gold:#b8860b;
+}
+*{box-sizing:border-box}
+body{margin:0;font-family:"Segoe UI",Calibri,Arial,sans-serif;color:var(--ink);background:var(--bg);font-size:15px;line-height:1.45}
+header{background:var(--navy);color:#fff;position:relative;overflow:hidden}
+header .stroke{position:absolute;right:-40px;top:14px;width:520px;height:58px;background:var(--red);
+  clip-path:polygon(4% 18%,30% 6%,62% 12%,100% 0,100% 100%,70% 88%,38% 96%,0 84%);opacity:.95}
+header .inner{position:relative;padding:14px 22px 16px;display:flex;flex-wrap:wrap;gap:6px 20px;align-items:flex-end;justify-content:space-between}
+header h1{margin:0;font-size:24px;letter-spacing:.3px}
+header .sub{font-size:13px;opacity:.9}
+header .tag{font-weight:700;font-size:14px;position:relative;padding:6px 4px}
+.idbar{display:flex;flex-wrap:wrap;gap:10px;padding:10px 22px;background:#fff;border-bottom:3px solid var(--red)}
+.idbar label{font-size:13px;color:var(--muted)}
+.idbar input{border:1px solid var(--line);border-radius:6px;padding:5px 8px;font-size:14px;margin-left:4px}
+main{display:grid;grid-template-columns:minmax(380px,1fr) minmax(420px,1.1fr);gap:16px;padding:16px;max-width:1500px;margin:0 auto}
+@media (max-width:980px){main{grid-template-columns:1fr}.simcol{position:static!important}}
+.card{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:14px}
+.simcol{position:sticky;top:10px;align-self:start}
+h2{margin:0 0 8px;font-size:18px;color:var(--navy)}
+h3{margin:16px 0 6px;font-size:16px;color:var(--navy);border-left:4px solid var(--red);padding-left:8px}
+.modes{display:flex;gap:6px;margin-bottom:8px}
+button{font:inherit;cursor:pointer;border-radius:7px;border:1px solid var(--navy);background:#fff;color:var(--navy);padding:6px 12px}
+button.primary{background:var(--navy);color:#fff}
+button.red{background:var(--red);border-color:var(--red);color:#fff}
+.modes button.on{background:var(--navy);color:#fff}
+canvas{width:100%;display:block;background:#fbfcff;border:1px solid var(--line);border-radius:8px}
+.ctrls{display:grid;grid-template-columns:1fr 1fr;gap:6px 14px;margin:10px 0}
+.ctrl{display:flex;flex-direction:column;font-size:13px}
+.ctrl .row{display:flex;gap:6px;align-items:center}
+.ctrl input[type=range]{flex:1;accent-color:var(--navy)}
+.ctrl input[type=number]{width:72px;padding:3px 5px;border:1px solid var(--line);border-radius:5px}
+.ctrl select{padding:4px;border:1px solid var(--line);border-radius:5px}
+.btns{display:flex;gap:8px;flex-wrap:wrap;margin:6px 0}
+.msg{font-size:13px;color:var(--red);min-height:18px}
+.readouts{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-top:6px}
+.ro{background:#f1f4fa;border-radius:7px;padding:5px 8px;font-size:12px;color:var(--muted)}
+.ro b{display:block;font-size:15px;color:var(--ink)}
+.ro.key{background:#fdecef}
+table{border-collapse:collapse;width:100%;font-size:13px;margin:6px 0}
+th,td{border:1px solid var(--line);padding:4px 6px;text-align:center}
+th{background:var(--navy);color:#fff;font-weight:600}
+td input{width:100%;min-width:52px;border:none;background:#fffbe8;padding:3px;text-align:center;font:inherit}
+.logwrap{max-height:170px;overflow:auto;margin-top:8px}
+.tabs{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px}
+.tabs button{border-width:2px;font-weight:600}
+.tabs button.on{color:#fff}
+.tabs button[data-t=key].on{background:var(--navy)}
+.tabs button[data-t=bronze]{border-color:var(--bronze);color:var(--bronze)}
+.tabs button[data-t=bronze].on{background:var(--bronze);color:#fff}
+.tabs button[data-t=silver]{border-color:var(--silver);color:var(--silver)}
+.tabs button[data-t=silver].on{background:var(--silver);color:#fff}
+.tabs button[data-t=gold]{border-color:var(--gold);color:var(--gold)}
+.tabs button[data-t=gold].on{background:var(--gold);color:#fff}
+.panel{display:none}.panel.on{display:block}
+.lvlhead{border-radius:8px;padding:10px 12px;color:#fff;margin-bottom:8px}
+.lvlhead.bronze{background:linear-gradient(90deg,var(--bronze),#c98a52)}
+.lvlhead.silver{background:linear-gradient(90deg,var(--silver),#9aa6b4)}
+.lvlhead.gold{background:linear-gradient(90deg,var(--gold),#d9ad3c)}
+.lvlhead h2{color:#fff;margin:0}
+.chips{display:flex;gap:6px;flex-wrap:wrap;margin-top:5px}
+.chip{background:rgba(255,255,255,.22);border-radius:12px;padding:1px 9px;font-size:12px}
+.setup{background:#eef2fb;border:1px dashed var(--navy2);border-radius:8px;padding:7px 10px;font-size:13.5px;margin:6px 0}
+.q{margin:8px 0}
+.q p{margin:0 0 4px}
+.q .lv{font-size:11px;color:#fff;background:var(--navy2);border-radius:9px;padding:0 6px;margin-left:4px;white-space:nowrap}
+textarea{width:100%;min-height:58px;border:1px solid var(--line);border-radius:7px;padding:6px;font:inherit;background:#fffbe8}
+.mcq{background:#fff7f8;border:1px solid #f1c3cb;border-radius:8px;padding:8px 10px;margin:10px 0}
+.mcq label{display:block;margin:3px 0;cursor:pointer}
+.fb{font-size:13px;margin-top:4px}
+.drs{background:#f0f7f1;border:1px solid #b9dcc0;border-radius:8px;padding:8px 10px;margin:10px 0;font-size:13.5px}
+.drs ul{margin:4px 0 0 18px;padding:0}
+.eq{font-family:"Cambria Math",Cambria,Georgia,serif;font-size:16px;background:#f1f4fa;border-radius:6px;padding:6px 10px;display:inline-block;margin:3px 0}
+.foot{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px;border-top:1px solid var(--line);padding-top:10px}
+.note{font-size:12px;color:var(--muted)}
+.mis td{text-align:left}
+footer{text-align:center;font-size:12px;color:var(--muted);padding:6px 0 18px}
+@media print{
+  header .stroke{display:none} header{background:#fff;color:var(--navy);border-bottom:3px solid var(--red)}
+  .simcol,.tabs,.foot,.noprint{display:none!important}
+  main{display:block;padding:0} .card{border:none}
+  .panel{display:none!important}.panel.on{display:block!important}
+  textarea{border:1px solid #999;background:#fff} td input{background:#fff}
+}
+</style>
+</head>
+<body>
+<header>
+  <div class="stroke"></div>
+  <div class="inner">
+    <div>
+      <div class="sub">Al Ittihad National Private School · Physics I (PHY311) · Grade 11</div>
+      <h1>W12L03 · Work Done Virtual Lab</h1>
+    </div>
+    <div class="tag">Unit 2 / Work &amp; Energy</div>
+  </div>
+</header>
+<div class="idbar">
+  <label>Name <input id="sName" size="22"></label>
+  <label>Class <input id="sClass" size="6" placeholder="11AB"></label>
+  <label>Date <input id="sDate" size="10"></label>
+</div>
+
+<main>
+<!-- ================= SIMULATION ================= -->
+<section class="card simcol">
+  <h2>Lab Bench</h2>
+  <div class="modes">
+    <button data-mode="block" class="on">Block + constant force</button>
+    <button data-mode="spring">Spring: F–x graph</button>
+  </div>
+  <canvas id="cv" width="640" height="300"></canvas>
+
+  <div id="blockCtrls">
+    <div class="ctrls" id="ctrlGrid"></div>
+    <div class="btns">
+      <button class="primary" id="runBtn">▶ Run trial</button>
+      <button id="resetBtn">↺ Reset block</button>
+      <button id="clearLog">Clear log</button>
+    </div>
+    <div class="msg" id="msg"></div>
+    <div class="readouts" id="readouts"></div>
+    <div class="logwrap">
+      <table id="logT"><thead><tr><th>#</th><th>m (kg)</th><th>F (N)</th><th>θ (°)</th><th>μk</th><th>v₀ (m/s)</th><th>s (m)</th><th>v_f (m/s)</th><th>W_F (J)</th><th>W_f (J)</th><th>W_net (J)</th></tr></thead><tbody></tbody></table>
+    </div>
+    <p class="note">Your trials are added to the log automatically. The block starts at x = 0 and the trial ends when it reaches the target distance d or stops. You may assume μs = μk.</p>
+  </div>
+
+  <div id="springCtrls" style="display:none">
+    <div class="ctrls" id="ctrlGrid2"></div>
+    <div class="btns"><button class="primary" id="areaBtn">Reveal area (work)</button></div>
+    <div class="readouts" id="readouts2"></div>
+    <p class="note">The graph shows the force <b>you</b> apply to stretch the spring, F = kx. The work you do from x₁ to x₂ is the shaded area under the graph.</p>
+  </div>
+</section>
+
+<!-- ================= WORKSHEETS ================= -->
+<section class="card worksheet">
+  <div class="tabs noprint">
+    <button data-t="key" class="on">Key Ideas</button>
+    <button data-t="bronze">Bronze</button>
+    <button data-t="silver">Silver</button>
+    <button data-t="gold">Gold</button>
+  </div>
+
+  <!-- KEY IDEAS -->
+  <div class="panel on" id="p-key">
+    <h2>Key Ideas: Work Done by a Force</h2>
+    <p><b>Learning goal:</b> I can calculate the work done by a constant force, explain when work is positive, negative or zero, use the area under an F–x graph to find work, and connect net work to change in kinetic energy.</p>
+    <h3>Core relationships</h3>
+    <div class="eq">W = F d cos θ</div> &nbsp; θ is the angle between the force and the displacement.<br>
+    <div class="eq">1 J = 1 N·m = 1 kg·m²/s²</div><br>
+    <div class="eq">W<sub>net</sub> = ΔKE = ½mv<sub>f</sub>² − ½mv<sub>i</sub>²</div> &nbsp; (work–energy theorem)<br>
+    <div class="eq">W = area under the F–x graph</div> &nbsp; For a spring: W = ½k(x₂² − x₁²)
+    <h3>Sign of work</h3>
+    <table>
+      <tr><th>Angle θ</th><th>cos θ</th><th>Work</th><th>Effect on the object's speed (if it is the only force)</th></tr>
+      <tr><td>0° ≤ θ &lt; 90°</td><td>positive</td><td>Positive</td><td>Speeds up (energy transferred <i>to</i> the object)</td></tr>
+      <tr><td>θ = 90°</td><td>0</td><td>Zero</td><td>No change in speed</td></tr>
+      <tr><td>90° &lt; θ ≤ 180°</td><td>negative</td><td>Negative</td><td>Slows down (energy transferred <i>from</i> the object)</td></tr>
+    </table>
+    <h3>On the horizontal bench</h3>
+    <p>When F is pulled at angle θ above the horizontal: <span class="eq">N = mg − F sin θ</span> and kinetic friction is <span class="eq">f = μ<sub>k</sub>N</span>. Gravity and the normal force are perpendicular to a horizontal displacement, so they do <b>zero work</b>. Friction opposes the motion, so it does <b>negative work</b>. Use g = 9.8 m/s².</p>
+    <h3>Common misconceptions</h3>
+    <table class="mis">
+      <tr><th>Misconception</th><th>Scientific idea</th></tr>
+      <tr><td>"If I push hard and get tired, I did work on the object."</td><td>Work on an object needs a displacement. If d = 0 (e.g., holding a box still), W = 0 J on the box.</td></tr>
+      <tr><td>"Work is a vector because force and displacement are vectors."</td><td>Work is a <b>scalar</b>. A positive or negative sign shows whether energy is transferred to or from the object, not a direction.</td></tr>
+      <tr><td>"Every force acting on a moving object does work on it."</td><td>A force perpendicular to the displacement (N and mg on a horizontal floor) does zero work.</td></tr>
+      <tr><td>"A larger angle always means less work."</td><td>The applied force does less work at larger θ, but pulling upward reduces N and therefore reduces friction. So the <i>net</i> work can increase.</td></tr>
+      <tr><td>"For a spring, W = F × Δx."</td><td>The spring force changes with x, so use the <b>area</b> under the F–x graph, not one value of F.</td></tr>
+    </table>
+    <h3>Vocabulary to use</h3>
+    <p>work · joule · displacement · component · parallel / perpendicular · scalar · positive / negative work · net work · kinetic energy · work–energy theorem · normal force · kinetic friction · coefficient of kinetic friction · spring constant · area under the graph · directly proportional</p>
+    <div class="drs"><b>Sentence stems for discussion:</b>
+      <ul>
+        <li>"The work done by ___ is positive/negative/zero because the angle between ___ and ___ is ___."</li>
+        <li>"Our data shows that when ___ increases, the work ___, which means ___."</li>
+        <li>"The net work equals the change in kinetic energy, so ___."</li>
+        <li>"I agree/disagree with ___ because the evidence from trial ___ shows ___."</li>
+      </ul></div>
+    <p class="note">Choose your level from the tabs above. Bronze = core skills, Silver = secure, Gold = extended. Answers are saved in this browser as you type.</p>
+  </div>
+
+  <!-- BRONZE -->
+  <div class="panel" id="p-bronze">
+    <div class="lvlhead bronze"><h2>Bronze: Work Done by a Constant Force</h2>
+      <div class="chips"><span class="chip">Bloom's: Remember · Understand · Apply</span><span class="chip">DOK 1–2</span><span class="chip">5E: Engage → Explore → Explain</span></div></div>
+    <p><b>Success criteria:</b> I can calculate W = Fd, give the joule in base units, and decide whether work is positive, negative or zero.</p>
+
+    <h3>Engage: Predict</h3>
+    <div class="q"><p>P1. If you double the force on the block but keep the distance the same, what happens to the work done? Give a reason. <span class="lv">DOK 1</span></p><textarea></textarea></div>
+
+    <h3>Explore A: Changing the force</h3>
+    <div class="setup"><b>Set up:</b> Surface = Frictionless · m = 2.0 kg · θ = 0° · d = 4.0 m · v₀ = 0 m/s. Run one trial for each force.</div>
+    <table><tr><th>F (N)</th><th>s from sim (m)</th><th>W = F·s, your calculation (J)</th><th>W_F from sim (J)</th><th>v_f (m/s)</th></tr>
+      <tr><td>10</td><td><input></td><td><input></td><td><input></td><td><input></td></tr>
+      <tr><td>20</td><td><input></td><td><input></td><td><input></td><td><input></td></tr>
+      <tr><td>30</td><td><input></td><td><input></td><td><input></td><td><input></td></tr>
+      <tr><td>40</td><td><input></td><td><input></td><td><input></td><td><input></td></tr>
+    </table>
+    <div class="q"><p>B1. Describe the relationship between F and W. Use the phrase "directly proportional" and refer to your data. <span class="lv">DOK 2</span></p><textarea></textarea></div>
+    <div class="q"><p>B2. Show that 1 J = 1 kg·m²/s², starting from W = Fd and F = ma. <span class="lv">DOK 1</span></p><textarea></textarea></div>
+
+    <h3>Explore B: Positive, zero and negative work</h3>
+    <div class="setup"><b>Set up:</b> Surface = Frictionless · m = 2.0 kg · F = 10 N · d = 4.0 m · v₀ = 4.0 m/s. Run θ = 0°, 90° and 180°.</div>
+    <table><tr><th>θ (°)</th><th>cos θ</th><th>s (m)</th><th>W_F (J)</th><th>+ / 0 / −</th><th>Speed: up / same / down</th></tr>
+      <tr><td>0</td><td><input></td><td><input></td><td><input></td><td><input></td><td><input></td></tr>
+      <tr><td>90</td><td><input></td><td><input></td><td><input></td><td><input></td><td><input></td></tr>
+      <tr><td>180</td><td><input></td><td><input></td><td><input></td><td><input></td><td><input></td></tr>
+    </table>
+    <div class="q"><p>B3. Complete: "When the force is perpendicular to the displacement, the work done is ___ because cos 90° = ___." <span class="lv">DOK 1</span></p><textarea></textarea></div>
+    <div class="q"><p>B4. At θ = 180° the block stopped before reaching 4.0 m. Use the sim values to show that the work done by F equals −½mv₀². <span class="lv">DOK 2</span></p><textarea></textarea></div>
+
+    <h3>Explain: Misconception check</h3>
+    <div class="mcq" data-ans="c"><p><b>M1.</b> A student holds a 10 kg box perfectly still at shoulder height for 2 minutes. How much work does the student do <i>on the box</i>?</p>
+      <label><input type="radio" name="mb" value="a"> A. 98 J, because the student supplies a 98 N force</label>
+      <label><input type="radio" name="mb" value="b"> B. 11 760 J, because 98 N × 120 s</label>
+      <label><input type="radio" name="mb" value="c"> C. 0 J, because the box has no displacement</label>
+      <label><input type="radio" name="mb" value="d"> D. It depends on how tired the student feels</label>
+      <button class="chk">Check</button><div class="fb"></div>
+      <div class="fbtext" hidden>Correct. W = Fd cos θ and d = 0, so W = 0 J on the box. The student's muscles use energy internally, but no energy is transferred to the box.|Not quite. Work needs a displacement. Look at d in W = Fd cos θ: what is d here?</div></div>
+
+    <div class="drs"><b>Discuss · Record · Share:</b> With your partner, explain why the normal force did no work in Explore A. Write one sentence using the words <i>perpendicular</i> and <i>displacement</i>, then share it with the class.
+      <textarea></textarea></div>
+  </div>
+
+  <!-- SILVER -->
+  <div class="panel" id="p-silver">
+    <div class="lvlhead silver"><h2>Silver: Force at an Angle &amp; the Work–Energy Theorem</h2>
+      <div class="chips"><span class="chip">Bloom's: Apply · Analyse</span><span class="chip">DOK 2–3</span><span class="chip">5E: Explore → Explain → Elaborate</span></div></div>
+    <p><b>Success criteria:</b> I can use W = Fd cos θ, use a graph to find the slope Fd, calculate the work done by every force, and show that W<sub>net</sub> = ΔKE.</p>
+
+    <h3>Engage: Predict</h3>
+    <div class="q"><p>P1. On a frictionless surface, with F and d kept the same, which angle (0°, 45° or 90°) gives the most work? Sketch or describe the force components to justify your answer. <span class="lv">DOK 2</span></p><textarea></textarea></div>
+
+    <h3>Explore A: Changing the angle</h3>
+    <div class="setup"><b>Set up:</b> Surface = Frictionless · m = 4.0 kg · F = 20 N · d = 5.0 m · v₀ = 0 m/s. Run each angle.</div>
+    <table id="silverA"><tr><th>θ (°)</th><th>cos θ</th><th>W_F from sim (J)</th><th>W = Fd cos θ (J)</th></tr>
+      <tr><td>0</td><td><input></td><td><input></td><td><input></td></tr>
+      <tr><td>15</td><td><input></td><td><input></td><td><input></td></tr>
+      <tr><td>30</td><td><input></td><td><input></td><td><input></td></tr>
+      <tr><td>45</td><td><input></td><td><input></td><td><input></td></tr>
+      <tr><td>60</td><td><input></td><td><input></td><td><input></td></tr>
+      <tr><td>75</td><td><input></td><td><input></td><td><input></td></tr>
+      <tr><td>90</td><td><input></td><td><input></td><td><input></td></tr>
+    </table>
+    <div class="btns noprint"><button class="primary" id="plotBtn">Plot W against cos θ</button><span class="note" id="fitOut"></span></div>
+    <canvas id="plot" width="560" height="260" style="max-width:560px"></canvas>
+    <div class="q"><p>S1. Your graph of W against cos θ is a straight line. What does the slope represent? Calculate its expected value and compare it with your best-fit slope. <span class="lv">DOK 2</span></p><textarea></textarea></div>
+    <div class="q"><p>S2. Explain, using force components, why only F cos θ does work on the block. What happens to the vertical component F sin θ? <span class="lv">DOK 2</span></p><textarea></textarea></div>
+
+    <h3>Explore B: Adding friction</h3>
+    <div class="setup"><b>Set up:</b> Surface = Wood (μk = 0.20) · m = 4.0 kg · F = 20 N · θ = 0° · d = 5.0 m · v₀ = 0 m/s.</div>
+    <table><tr><th>Quantity</th><th>Your calculation</th><th>Sim value</th></tr>
+      <tr><td>Normal force N (N)</td><td><input></td><td><input></td></tr>
+      <tr><td>Friction f = μkN (N)</td><td><input></td><td><input></td></tr>
+      <tr><td>W by applied force (J)</td><td><input></td><td><input></td></tr>
+      <tr><td>W by friction (J)</td><td><input></td><td><input></td></tr>
+      <tr><td>W by normal force and gravity (J)</td><td><input></td><td><input></td></tr>
+      <tr><td>W<sub>net</sub> (J)</td><td><input></td><td><input></td></tr>
+      <tr><td>ΔKE = ½mv<sub>f</sub>² − ½mv<sub>i</sub>² (J)</td><td><input></td><td><input></td></tr>
+    </table>
+    <div class="q"><p>S3. Compare W<sub>net</sub> with ΔKE. State the work–energy theorem in your own words. <span class="lv">DOK 2</span></p><textarea></textarea></div>
+    <div class="q"><p>S4. Use the work–energy theorem (not kinematics) to predict v<sub>f</sub>, then check it against the sim. Show every step with units. <span class="lv">DOK 3</span></p><textarea></textarea></div>
+
+    <h3>Explain: Misconception check</h3>
+    <div class="mcq" data-ans="b"><p><b>M2.</b> Friction does −39 J of work on the block in Explore B. Which statement is correct?</p>
+      <label><input type="radio" name="ms" value="a"> A. The negative sign means the work points to the left</label>
+      <label><input type="radio" name="ms" value="b"> B. Friction transfers 39 J of energy out of the block's kinetic energy</label>
+      <label><input type="radio" name="ms" value="c"> C. Negative work is impossible, so the sim is wrong</label>
+      <label><input type="radio" name="ms" value="d"> D. Friction does zero work because the floor does not move</label>
+      <button class="chk">Check</button><div class="fb"></div>
+      <div class="fbtext" hidden>Correct. Work is a scalar. The negative sign means energy is transferred away from the block's kinetic energy, mostly to thermal energy.|Not quite. Work is a scalar, so it has no direction. Think about what the sign tells you about energy transfer.</div></div>
+
+    <div class="drs"><b>Discuss · Record · Share:</b> In your group, decide which of the four forces in Explore B does positive, negative and zero work. Record the group's justification using <i>parallel, anti-parallel, perpendicular</i>, then share it on the board.
+      <textarea></textarea></div>
+  </div>
+
+  <!-- GOLD -->
+  <div class="panel" id="p-gold">
+    <div class="lvlhead gold"><h2>Gold: Investigate, Derive &amp; Evaluate</h2>
+      <div class="chips"><span class="chip">Bloom's: Analyse · Evaluate · Create</span><span class="chip">DOK 3–4</span><span class="chip">5E: Elaborate → Evaluate</span></div></div>
+    <p><b>Success criteria:</b> I can find an unknown coefficient of friction from energy measurements, analyse how angle affects net work, use area under an F–x graph, and evaluate claims using evidence.</p>
+
+    <h3>Part A: The mystery surface</h3>
+    <div class="setup"><b>Set up:</b> Surface = Mystery (μk hidden) · m = 5.0 kg · θ = 0° · d = 4.0 m · v₀ = 0 m/s. The sim only shows s, t and v_f for this surface.</div>
+    <div class="q"><p>G1. Starting from W<sub>net</sub> = ΔKE, derive an expression for μk in terms of F, d, m, g and v<sub>f</sub>. <span class="lv">DOK 3</span></p><textarea></textarea></div>
+    <table><tr><th>Trial</th><th>F (N)</th><th>v_f from sim (m/s)</th><th>μk calculated</th></tr>
+      <tr><td>1</td><td>40</td><td><input></td><td><input></td></tr>
+      <tr><td>2</td><td>50</td><td><input></td><td><input></td></tr>
+      <tr><td>3</td><td>60</td><td><input></td><td><input></td></tr>
+      <tr><td colspan="3">Mean μk</td><td><input></td></tr>
+    </table>
+    <div class="q"><p>G2. Why should μk stay the same when F changes? What does your data show? Suggest one reason why a real experiment would show more spread. <span class="lv">DOK 3</span></p><textarea></textarea></div>
+
+    <h3>Part B: Is there a best pulling angle?</h3>
+    <div class="setup"><b>Set up:</b> Surface = Rubber (μk = 0.50) · m = 5.0 kg · F = 30 N · d = 5.0 m · v₀ = 0 m/s.</div>
+    <table><tr><th>θ (°)</th><th>N (N)</th><th>W_F (J)</th><th>W_f (J)</th><th>W_net (J)</th></tr>
+      <tr><td>0</td><td><input></td><td><input></td><td><input></td><td><input></td></tr>
+      <tr><td>10</td><td><input></td><td><input></td><td><input></td><td><input></td></tr>
+      <tr><td>20</td><td><input></td><td><input></td><td><input></td><td><input></td></tr>
+      <tr><td>30</td><td><input></td><td><input></td><td><input></td><td><input></td></tr>
+      <tr><td>40</td><td><input></td><td><input></td><td><input></td><td><input></td></tr>
+      <tr><td>50</td><td><input></td><td><input></td><td><input></td><td><input></td></tr>
+      <tr><td>60</td><td><input></td><td><input></td><td><input></td><td><input></td></tr>
+    </table>
+    <div class="q"><p>G3. Show that W<sub>net</sub> = Fd(cos θ + μk sin θ) − μk mgd. <span class="lv">DOK 3</span></p><textarea></textarea></div>
+    <div class="q"><p>G4. Use your table to narrow down the angle that gives the greatest net work, to the nearest degree. Then test the idea that the best angle satisfies tan θ = μk. <span class="lv">DOK 4</span></p><textarea></textarea></div>
+    <div class="q"><p>G5. <b>Claim-Evidence-Reasoning:</b> A student claims, "Pulling at a larger angle always means less work is done on the box." Evaluate the claim using evidence from your table and the physics of N and f. <span class="lv">DOK 4</span></p><textarea></textarea></div>
+
+    <h3>Part C: Variable force, area under F–x</h3>
+    <div class="setup"><b>Set up:</b> Switch the Lab Bench to <b>Spring: F–x graph</b>. k = 80 N/m · x₁ = 0.10 m · x₂ = 0.30 m. Calculate first, then press "Reveal area" to check.</div>
+    <table><tr><th>F₁ = kx₁ (N)</th><th>F₂ = kx₂ (N)</th><th>Shape of the area</th><th>W = area (J)</th><th>Check: ½k(x₂² − x₁²) (J)</th></tr>
+      <tr><td><input></td><td><input></td><td><input></td><td><input></td><td><input></td></tr></table>
+    <div class="q"><p>G6. A student calculates W = F₂ × Δx = 24 × 0.20 = 4.8 J. Explain the error and why their answer is too large. <span class="lv">DOK 3</span></p><textarea></textarea></div>
+    <div class="q"><p>G7. <b>Create:</b> Design a two-step stretch (0 → 0.20 m, then 0.20 → 0.40 m) for a spring with k = 100 N/m. Predict which step needs more work and by what factor, then verify with the sim. <span class="lv">DOK 4</span></p><textarea></textarea></div>
+
+    <h3>Evaluate: Misconception check</h3>
+    <div class="mcq" data-ans="d"><p><b>M3.</b> In Part B, the angle increases from 0° to 20°. Which statement best explains why W<sub>net</sub> increases?</p>
+      <label><input type="radio" name="mg" value="a"> A. The applied force does more work at 20°</label>
+      <label><input type="radio" name="mg" value="b"> B. Gravity does positive work when you pull upward</label>
+      <label><input type="radio" name="mg" value="c"> C. The normal force does positive work at 20°</label>
+      <label><input type="radio" name="mg" value="d"> D. N decreases, so friction does less negative work, and this outweighs the drop in W_F</label>
+      <button class="chk">Check</button><div class="fb"></div>
+      <div class="fbtext" hidden>Correct. W_F falls slightly (cos 20° &lt; 1), but N = mg − F sin θ falls, so |W_f| falls by more. The net work increases.|Not quite. Check your table: W_F actually falls a little. Which other work term changes, and why?</div></div>
+
+    <div class="drs"><b>Discuss · Record · Share:</b> Prepare a 30-second explanation for the class: "Why do people pull a heavy suitcase with the handle angled up?" Use <i>normal force, kinetic friction, net work</i> and your data.
+      <textarea></textarea></div>
+  </div>
+
+  <div class="foot noprint">
+    <button class="primary" id="copyBtn">Copy my answers</button>
+    <button id="printBtn">Print / Save as PDF</button>
+    <span class="note" id="footNote"></span>
+  </div>
+</section>
+</main>
+<footer>W12L03 Work Done Lab · Physics I (PHY311) · g = 9.8 m/s² · SI units throughout</footer>
+
+<script>
+(function(){
+const g = 9.8;
+const SURF = {frictionless:{mu:0,label:"Frictionless (μk = 0)"},ice:{mu:0.05,label:"Ice (μk = 0.05)"},wood:{mu:0.20,label:"Wood (μk = 0.20)"},rubber:{mu:0.50,label:"Rubber (μk = 0.50)"},mystery:{mu:0.35,label:"Mystery (μk = ?)",hidden:true}};
+const S = {mode:"block", surf:"frictionless", m:2, F:10, th:0, d:4, v0:0, k:80, x1:0.10, x2:0.30, reveal:false};
+const fmt = (v,n=2)=> (Math.abs(v)<5e-10?0:v).toFixed(n);
+
+/* ---------- controls ---------- */
+function makeCtrl(parent,key,label,min,max,step,unit){
+  const w=document.createElement("div");w.className="ctrl";
+  w.innerHTML=`<span>${label} (${unit})</span><div class="row"><input type="range" min="${min}" max="${max}" step="${step}" value="${S[key]}"><input type="number" min="${min}" max="${max}" step="${step}" value="${S[key]}"></div>`;
+  const [r,n]=w.querySelectorAll("input");
+  const set=v=>{v=Math.min(max,Math.max(min,parseFloat(v)||0));S[key]=v;r.value=v;n.value=v;onChange();};
+  r.addEventListener("input",()=>set(r.value));n.addEventListener("change",()=>set(n.value));
+  parent.appendChild(w);
+}
+const grid=document.getElementById("ctrlGrid");
+const sw=document.createElement("div");sw.className="ctrl";
+sw.innerHTML=`<span>Surface</span><select>${Object.entries(SURF).map(([k,v])=>`<option value="${k}">${v.label}</option>`).join("")}</select>`;
+sw.querySelector("select").addEventListener("change",e=>{S.surf=e.target.value;onChange();});
+grid.appendChild(sw);
+makeCtrl(grid,"m","Mass m",0.5,10,0.5,"kg");
+makeCtrl(grid,"F","Applied force F",0,100,1,"N");
+makeCtrl(grid,"th","Angle θ above horizontal",0,180,1,"°");
+makeCtrl(grid,"d","Target distance d",0.5,10,0.5,"m");
+makeCtrl(grid,"v0","Initial speed v₀",0,10,0.5,"m/s");
+const grid2=document.getElementById("ctrlGrid2");
+makeCtrl(grid2,"k","Spring constant k",10,200,5,"N/m");
+makeCtrl(grid2,"x1","Start extension x₁",0,0.5,0.01,"m");
+makeCtrl(grid2,"x2","End extension x₂",0,0.5,0.01,"m");
+
+/* ---------- physics ---------- */
+function solve(){
+  const mu=SURF[S.surf].mu, th=S.th*Math.PI/180;
+  const Fx=S.F*Math.cos(th), Fy=S.F*Math.sin(th);
+  const N=S.m*g-Fy;
+  if(N< -1e-9) return {lifted:true,N};
+  const f=mu*N;
+  let a=(Fx-f)/S.m, s, vf, t, moves=true;
+  if(S.v0===0 && Fx<=f+1e-12){moves=false;s=0;vf=0;t=0;a=0;}
+  else{
+    if(a<0){const stop=S.v0*S.v0/(2*-a); s=Math.min(S.d,stop);} else s=S.d;
+    vf=Math.sqrt(Math.max(0,S.v0*S.v0+2*a*s));
+    t=Math.abs(a)<1e-9? s/S.v0 : (vf-S.v0)/a;
+  }
+  const WF=Fx*s, Wf=-f*s, Wnet=WF+Wf, KEi=0.5*S.m*S.v0*S.v0, KEf=0.5*S.m*vf*vf;
+  return {mu,th,Fx,Fy,N,f,a,s,vf,t,WF,Wf,Wnet,KEi,KEf,dKE:KEf-KEi,moves};
+}
+
+/* ---------- drawing ---------- */
+const cv=document.getElementById("cv"), ctx=cv.getContext("2d");
+const W=640,H=300;
+function fitCanvas(c,w,h){const dpr=window.devicePixelRatio||1;c.width=w*dpr;c.height=h*dpr;c.getContext("2d").setTransform(dpr,0,0,dpr,0,0);}
+fitCanvas(cv,W,H);
+const X0=40, PPM=52, GY=185, BW=56, BH=40;
+let anim=null, pos=0, vel=S.v0, result=null, hasRun=false;
+
+function arrow(x1,y1,x2,y2,col,label,lx,ly){
+  if(Math.hypot(x2-x1,y2-y1)<2)return;
+  ctx.strokeStyle=col;ctx.fillStyle=col;ctx.lineWidth=3;
+  ctx.beginPath();ctx.moveTo(x1,y1);ctx.lineTo(x2,y2);ctx.stroke();
+  const an=Math.atan2(y2-y1,x2-x1);ctx.beginPath();ctx.moveTo(x2,y2);
+  ctx.lineTo(x2-11*Math.cos(an-0.4),y2-11*Math.sin(an-0.4));ctx.lineTo(x2-11*Math.cos(an+0.4),y2-11*Math.sin(an+0.4));ctx.closePath();ctx.fill();
+  if(label){ctx.font="bold 13px Segoe UI, Arial";ctx.fillText(label,lx??x2+4,ly??y2-4);}
+}
+function drawBlock(){
+  ctx.clearRect(0,0,W,H);
+  const sol=solve(), hid=SURF[S.surf].hidden;
+  // surface
+  ctx.fillStyle=S.surf==="ice"?"#dff1ff":S.surf==="wood"?"#e9d3b0":S.surf==="rubber"?"#bfc3c9":S.surf==="mystery"?"#e7dcf5":"#eef1f6";
+  ctx.fillRect(0,GY,W,14);ctx.strokeStyle="#0b2a63";ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(0,GY);ctx.lineTo(W,GY);ctx.stroke();
+  // ruler
+  ctx.fillStyle="#5b6578";ctx.font="11px Segoe UI, Arial";ctx.lineWidth=1;ctx.strokeStyle="#5b6578";
+  for(let i=0;i<=10;i++){const x=X0+i*PPM;ctx.beginPath();ctx.moveTo(x,GY+14);ctx.lineTo(x,GY+22);ctx.stroke();ctx.fillText(i+" m",x-8,GY+34);}
+  // target
+  const tx=X0+S.d*PPM;ctx.strokeStyle="#c8102e";ctx.setLineDash([6,4]);ctx.beginPath();ctx.moveTo(tx,40);ctx.lineTo(tx,GY);ctx.stroke();ctx.setLineDash([]);
+  ctx.fillStyle="#c8102e";ctx.font="bold 12px Segoe UI, Arial";ctx.fillText("d = "+S.d+" m",tx-24,34);
+  // block
+  const bx=X0+pos*PPM, by=GY-BH;
+  ctx.fillStyle="#0b2a63";ctx.fillRect(bx-BW/2,by,BW,BH);ctx.fillStyle="#fff";ctx.font="bold 12px Segoe UI, Arial";ctx.fillText(S.m+" kg",bx-15,by+24);
+  ctx.fillStyle="#1b2333";ctx.font="12px Segoe UI, Arial";ctx.fillText("v = "+fmt(vel)+" m/s",bx-30,by-58<14?14:by-62);
+  if(sol.lifted){return;}
+  const cx=bx, cy=by+BH/2, maxF=Math.max(S.F,S.m*g,1), sc=85/maxF;
+  // forces
+  const L=S.F*sc; arrow(cx,cy,cx+L*Math.cos(sol.th),cy-L*Math.sin(sol.th),"#c8102e","F");
+  arrow(cx,by,cx,by-sol.N*sc,"#2e7d32","N",cx+5,by-sol.N*sc+10);
+  arrow(cx-12,cy,cx-12,cy+S.m*g*sc,"#6a1b9a","mg",cx-38,cy+S.m*g*sc);
+  if(sol.mu>0 && (sol.moves||hasRun)){
+    const fl=hid?30:sol.f*sc; arrow(cx-BW/2,GY-4,cx-BW/2-fl,GY-4,"#e65100",hid?"f = ?":"f",cx-BW/2-fl-16,GY-10);
+  }
+  if(sol.th>Math.PI/2+1e-9 && S.v0===0) {}
+}
+function drawSpring(){
+  ctx.clearRect(0,0,W,H);
+  const ox=70, oy=255, gw=520, gh=215, xmax=0.5;
+  const Fmax=Math.ceil(S.k*xmax/10)*10||10;
+  const px=x=>ox+x/xmax*gw, py=F=>oy-F/Fmax*gh;
+  // grid
+  ctx.strokeStyle="#e3e7ef";ctx.lineWidth=1;ctx.fillStyle="#5b6578";ctx.font="11px Segoe UI, Arial";
+  for(let i=0;i<=10;i++){const x=px(i*0.05);ctx.beginPath();ctx.moveTo(x,oy);ctx.lineTo(x,oy-gh);ctx.stroke();ctx.fillText((i*0.05).toFixed(2),x-11,oy+15);}
+  for(let j=0;j<=5;j++){const F=Fmax*j/5,y=py(F);ctx.beginPath();ctx.moveTo(ox,y);ctx.lineTo(ox+gw,y);ctx.stroke();ctx.fillText(F.toFixed(0),ox-28,y+4);}
+  ctx.strokeStyle="#0b2a63";ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(ox,oy-gh);ctx.lineTo(ox,oy);ctx.lineTo(ox+gw,oy);ctx.stroke();
+  ctx.fillStyle="#0b2a63";ctx.font="bold 12px Segoe UI, Arial";ctx.fillText("x (m)",ox+gw-30,oy+30);
+  ctx.save();ctx.translate(20,oy-gh/2);ctx.rotate(-Math.PI/2);ctx.fillText("F (N)",-15,0);ctx.restore();
+  // shaded area
+  const a=Math.min(S.x1,S.x2), b=Math.max(S.x1,S.x2);
+  ctx.fillStyle=S.x2>=S.x1?"rgba(11,42,99,.25)":"rgba(200,16,46,.25)";
+  ctx.beginPath();ctx.moveTo(px(a),oy);ctx.lineTo(px(a),py(S.k*a));ctx.lineTo(px(b),py(S.k*b));ctx.lineTo(px(b),oy);ctx.closePath();ctx.fill();
+  // line
+  ctx.strokeStyle="#c8102e";ctx.lineWidth=3;ctx.beginPath();ctx.moveTo(px(0),py(0));ctx.lineTo(px(xmax),py(S.k*xmax));ctx.stroke();
+  ctx.fillStyle="#c8102e";ctx.fillText("F = kx",px(0.4),py(S.k*0.4)-10);
+  [[S.x1,"x₁"],[S.x2,"x₂"]].forEach(([x,l])=>{ctx.fillStyle="#0b2a63";ctx.beginPath();ctx.arc(px(x),py(S.k*x),4,0,7);ctx.fill();ctx.fillText(l,px(x)-6,oy-4-(l==="x₁"?0:0)+ -6);});
+  if(S.reveal){ctx.fillStyle="#0b2a63";ctx.font="bold 14px Segoe UI, Arial";ctx.fillText("W = area = "+fmt(0.5*S.k*(S.x2*S.x2-S.x1*S.x1),3)+" J",ox+12,oy-gh+16);}
+}
+function draw(){S.mode==="block"?drawBlock():drawSpring();}
+
+/* ---------- readouts ---------- */
+const ro=document.getElementById("readouts"), ro2=document.getElementById("readouts2"), msg=document.getElementById("msg");
+function cell(l,v,k){return `<div class="ro${k?" key":""}">${l}<b>${v}</b></div>`;}
+function showReadouts(){
+  const sol=solve(), hid=SURF[S.surf].hidden, dash="—";
+  msg.textContent = sol.lifted ? "F sin θ is larger than mg: the force would lift the block off the surface. Reduce F or θ." : "";
+  document.getElementById("runBtn").disabled=!!sol.lifted;
+  if(sol.lifted){ro.innerHTML="";return;}
+  const r=hasRun?result:null, h=v=>hid?"hidden":v;
+  ro.innerHTML=
+    cell("Normal force N", r?h(fmt(r.N)+" N"):dash)+cell("Friction f", r?h(fmt(r.f)+" N"):dash)+cell("Acceleration a", r?h(fmt(r.a)+" m/s²"):dash)+
+    cell("Displacement s", r?fmt(r.s)+" m":dash)+cell("Time t", r?fmt(r.t)+" s":dash)+cell("Final speed v_f", r?fmt(r.vf)+" m/s":dash,1)+
+    cell("W by F", r?h(fmt(r.WF)+" J"):dash,1)+cell("W by friction", r?h(fmt(r.Wf)+" J"):dash,1)+cell("W by N and mg", r?"0.00 J":dash)+
+    cell("W_net", r?h(fmt(r.Wnet)+" J"):dash,1)+cell("KE_i / KE_f", r?h(fmt(r.KEi)+" / "+fmt(r.KEf)+" J"):dash)+cell("ΔKE", r?h(fmt(r.dKE)+" J"):dash,1);
+  if(hasRun && !r.moves) msg.textContent="The block did not move: F cos θ is not larger than friction. With no displacement, every force does zero work.";
+  else if(hasRun && r.s<S.d-1e-9) msg.textContent="The block stopped after "+fmt(r.s)+" m, before reaching d. Work is calculated using the actual displacement.";
+}
+function showSpring(){
+  const W12=0.5*S.k*(S.x2*S.x2-S.x1*S.x1);
+  ro2.innerHTML=cell("F₁ = kx₁",fmt(S.k*S.x1)+" N")+cell("F₂ = kx₂",fmt(S.k*S.x2)+" N")+cell("Δx = x₂ − x₁",fmt(S.x2-S.x1)+" m")+
+    cell("Work done by you",S.reveal?fmt(W12,3)+" J":"press Reveal",1);
+}
+function onChange(){
+  if(anim){cancelAnimationFrame(anim);anim=null;}
+  if(S.mode==="block"){hasRun=false;result=null;pos=0;vel=S.v0;showReadouts();}
+  else{S.reveal=false;showSpring();}
+  draw();
+}
+
+/* ---------- run ---------- */
+let trialN=0;
+document.getElementById("runBtn").onclick=()=>{
+  const sol=solve(); if(sol.lifted)return;
+  if(anim)cancelAnimationFrame(anim);
+  result=sol; hasRun=false; pos=0; vel=S.v0;
+  const T=sol.t||0, speed=Math.max(1,T/4);
+  const start=performance.now();
+  function step(now){
+    let ts=(now-start)/1000*speed; if(ts>T)ts=T;
+    pos=Math.min(sol.s,S.v0*ts+0.5*sol.a*ts*ts); vel=Math.max(0,S.v0+sol.a*ts);
+    drawBlock();
+    if(ts<T){anim=requestAnimationFrame(step);} else {anim=null;pos=sol.s;vel=sol.vf;hasRun=true;drawBlock();showReadouts();logTrial(sol);}
+  }
+  if(!sol.moves||T===0){hasRun=true;drawBlock();showReadouts();logTrial(sol);} else anim=requestAnimationFrame(step);
+};
+document.getElementById("resetBtn").onclick=onChange;
+function logTrial(r){
+  const hid=SURF[S.surf].hidden, tb=document.querySelector("#logT tbody"), tr=document.createElement("tr");
+  const h=v=>hid?"?":v;
+  tr.innerHTML=`<td>${++trialN}</td><td>${S.m}</td><td>${S.F}</td><td>${S.th}</td><td>${hid?"?":SURF[S.surf].mu.toFixed(2)}</td><td>${S.v0}</td><td>${fmt(r.s)}</td><td>${fmt(r.vf)}</td><td>${h(fmt(r.WF))}</td><td>${h(fmt(r.Wf))}</td><td>${h(fmt(r.Wnet))}</td>`;
+  tb.prepend(tr);
+}
+document.getElementById("clearLog").onclick=()=>{document.querySelector("#logT tbody").innerHTML="";trialN=0;};
+document.getElementById("areaBtn").onclick=()=>{S.reveal=true;showSpring();drawSpring();};
+document.querySelectorAll(".modes button").forEach(b=>b.onclick=()=>{
+  document.querySelectorAll(".modes button").forEach(x=>x.classList.toggle("on",x===b));
+  S.mode=b.dataset.mode;
+  document.getElementById("blockCtrls").style.display=S.mode==="block"?"":"none";
+  document.getElementById("springCtrls").style.display=S.mode==="spring"?"":"none";
+  onChange();
+});
+
+/* ---------- tabs ---------- */
+function showTab(t){
+  document.querySelectorAll(".tabs button").forEach(b=>b.classList.toggle("on",b.dataset.t===t));
+  document.querySelectorAll(".panel").forEach(p=>p.classList.toggle("on",p.id==="p-"+t));
+}
+document.querySelectorAll(".tabs button").forEach(b=>b.onclick=()=>{showTab(b.dataset.t);try{location.hash=b.dataset.t;}catch(e){}});
+const h0=(location.hash||"").slice(1); if(["key","bronze","silver","gold"].includes(h0))showTab(h0);
+
+/* ---------- MCQ ---------- */
+document.querySelectorAll(".mcq").forEach(q=>{
+  q.querySelector(".chk").onclick=()=>{
+    const sel=q.querySelector("input:checked"), fb=q.querySelector(".fb"), [ok,no]=q.querySelector(".fbtext").textContent.split("|");
+    if(!sel){fb.textContent="Choose an answer first.";fb.style.color="#5b6578";return;}
+    const right=sel.value===q.dataset.ans; fb.textContent=right?"✔ "+ok:"✘ "+no; fb.style.color=right?"#2e7d32":"#c8102e";
+  };
+});
+
+/* ---------- Silver plot ---------- */
+const pc=document.getElementById("plot"), pctx=pc.getContext("2d"); fitCanvas(pc,560,260);
+function plot(){
+  const pts=[];
+  document.querySelectorAll("#silverA tr").forEach((tr,i)=>{if(!i)return;
+    const td=tr.querySelectorAll("td"), th=parseFloat(td[0].textContent), inp=tr.querySelectorAll("input");
+    let x=parseFloat(inp[0].value); if(isNaN(x))x=Math.cos(th*Math.PI/180);
+    let y=parseFloat(inp[1].value); if(isNaN(y))y=parseFloat(inp[2].value);
+    if(!isNaN(y))pts.push([x,y]);});
+  pctx.clearRect(0,0,560,260);
+  const ox=55,oy=220,gw=470,gh=190, ymax=Math.max(10,...pts.map(p=>p[1]))*1.15;
+  const px=x=>ox+x*gw, py=y=>oy-y/ymax*gh;
+  pctx.strokeStyle="#e3e7ef";pctx.fillStyle="#5b6578";pctx.font="11px Segoe UI, Arial";pctx.lineWidth=1;
+  for(let i=0;i<=5;i++){const x=px(i/5);pctx.beginPath();pctx.moveTo(x,oy);pctx.lineTo(x,oy-gh);pctx.stroke();pctx.fillText((i/5).toFixed(1),x-8,oy+14);}
+  for(let j=0;j<=4;j++){const y=py(ymax*j/4);pctx.beginPath();pctx.moveTo(ox,y);pctx.lineTo(ox+gw,y);pctx.stroke();pctx.fillText((ymax*j/4).toFixed(0),ox-32,y+4);}
+  pctx.strokeStyle="#0b2a63";pctx.lineWidth=2;pctx.beginPath();pctx.moveTo(ox,oy-gh);pctx.lineTo(ox,oy);pctx.lineTo(ox+gw,oy);pctx.stroke();
+  pctx.fillStyle="#0b2a63";pctx.font="bold 12px Segoe UI, Arial";pctx.fillText("cos θ",ox+gw-30,oy+30);pctx.fillText("W (J)",6,oy-gh-6);
+  const out=document.getElementById("fitOut");
+  if(pts.length<2){out.textContent="Enter at least two W values in the table first.";return;}
+  pctx.fillStyle="#c8102e";pts.forEach(p=>{pctx.beginPath();pctx.arc(px(p[0]),py(p[1]),4,0,7);pctx.fill();});
+  const n=pts.length,sx=pts.reduce((a,p)=>a+p[0],0),sy=pts.reduce((a,p)=>a+p[1],0),sxx=pts.reduce((a,p)=>a+p[0]*p[0],0),sxy=pts.reduce((a,p)=>a+p[0]*p[1],0);
+  const den=n*sxx-sx*sx; if(Math.abs(den)<1e-12){out.textContent="Need different cos θ values.";return;}
+  const m=(n*sxy-sx*sy)/den,b=(sy-m*sx)/n;
+  pctx.strokeStyle="#0b2a63";pctx.setLineDash([5,4]);pctx.beginPath();pctx.moveTo(px(0),py(b));pctx.lineTo(px(1),py(m+b));pctx.stroke();pctx.setLineDash([]);
+  out.textContent="Best-fit line: W = "+m.toFixed(1)+" cos θ "+(b>=0?"+ ":"− ")+Math.abs(b).toFixed(1)+"  (slope in J)";
+}
+document.getElementById("plotBtn").onclick=plot;
+
+/* ---------- save / copy / print ---------- */
+const fields=[...document.querySelectorAll(".idbar input, .worksheet input, .worksheet textarea")];
+const KEY="w12l03-work-lab-v1";
+function save(){try{const d=fields.map(f=>f.type==="radio"?f.checked:f.value);localStorage.setItem(KEY,JSON.stringify(d));}catch(e){}}
+try{const d=JSON.parse(localStorage.getItem(KEY)||"null");if(d&&d.length===fields.length)fields.forEach((f,i)=>{if(f.type==="radio")f.checked=!!d[i];else f.value=d[i]||"";});}catch(e){}
+fields.forEach(f=>f.addEventListener(f.type==="radio"?"change":"input",save));
+
+document.getElementById("copyBtn").onclick=async()=>{
+  const p=document.querySelector(".panel.on"), lines=[];
+  lines.push("W12L03 Work Done Lab: "+p.querySelector("h2").textContent);
+  lines.push("Name: "+document.getElementById("sName").value+"   Class: "+document.getElementById("sClass").value+"   Date: "+document.getElementById("sDate").value,"");
+  p.querySelectorAll("h3, table, .q, .mcq, .drs").forEach(el=>{
+    if(el.tagName==="H3")lines.push("","## "+el.textContent);
+    else if(el.tagName==="TABLE"){el.querySelectorAll("tr").forEach(tr=>lines.push([...tr.children].map(c=>{const i=c.querySelector("input");return i?(i.value||"___"):c.textContent.trim();}).join(" | ")));}
+    else if(el.classList.contains("mcq")){const s=el.querySelector("input:checked");lines.push(el.querySelector("p").textContent.trim(),"Answer: "+(s?s.value.toUpperCase():"___"));}
+    else{const t=el.querySelector("textarea");const q=el.querySelector("p")?el.querySelector("p").textContent.trim():"Discuss · Record · Share";lines.push(q,"→ "+(t&&t.value?t.value:"___"),"");}
+  });
+  const note=document.getElementById("footNote");
+  try{await navigator.clipboard.writeText(lines.join("\n"));note.textContent="Copied. Paste into your Schoology submission.";}
+  catch(e){note.textContent="Copy was blocked by the browser. Select your answers and copy them manually.";}
+};
+document.getElementById("printBtn").onclick=()=>{
+  const note=document.getElementById("footNote");
+  note.textContent="Prints the level you have open. If nothing happens, download this file, open it in Chrome and press Ctrl + P.";
+  try{window.print();}catch(e){}
+};
+
+onChange();
+})();
+</script>
+</body>
+</html>
